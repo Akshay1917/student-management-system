@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Student Reports - SMS{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <div class="welcome-section">
+            <h1>Academic <span class="text-gradient">Reports</span></h1>
+            <p class="text-muted">Viewing all student performance records.</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('lecturer.dashboard') }}" class="btn glass">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Page
+            </button>
+        </div>
+    </header>
+
+    <div class="card glass">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>USN</th>
+                            <th>Name</th>
+                            <th>Subject</th>
+                            <th>Internal</th>
+                            <th>External</th>
+                            <th>Total</th>
+                            <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mark in marks %}
+                        <tr>
+                            <td>{{ mark.usn }}</td>
+                            <td>{{ mark.first_name }} {{ mark.last_name }}</td>
+                            <td>{{ mark.subject_name }} ({{ mark.subject_code }})</td>
+                            <td>{{ mark.internal_marks }}</td>
+                            <td>{{ mark.external_marks }}</td>
+                            <td><strong>{{ mark.total_marks }}</strong></td>
+                            <td><span class="badge grade-{{ mark.grade }}">{{ mark.grade }}</span></td>
+                        </tr>
+                        {% endfor %}
+                        {% if not marks %}
+                        <tr>
+                            <td colspan="7" class="text-center">No marks available.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

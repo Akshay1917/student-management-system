@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard - SMS{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <div class="welcome-section">
+            <h1>Welcome back, <span class="text-gradient">{{ profile.first_name }}</span>!</h1>
+            <p class="text-muted">Here's your academic overview for the current semester.</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('student.download_report') }}" class="btn btn-primary">
+                <i class="fas fa-download"></i> Download Report Card
+            </a>
+        </div>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card glass">
+            <div class="stat-icon"><i class="fas fa-book-open"></i></div>
+            <div class="stat-info">
+                <h3>Subjects</h3>
+                <p class="stat-value">{{ summary.subjects_taken or 0 }}</p>
+            </div>
+        </div>
+        <div class="stat-card glass">
+            <div class="stat-icon"><i class="fas fa-star"></i></div>
+            <div class="stat-info">
+                <h3>Average Score</h3>
+                <p class="stat-value">{{ "%.2f"|format(summary.average_score or 0) }}%</p>
+            </div>
+        </div>
+        <div class="stat-card glass">
+            <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
+            <div class="stat-info">
+                <h3>Overall Grade</h3>
+                <p class="stat-value">{{ summary.overall_grade or 'N/A' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="card glass chart-card">
+            <div class="card-header">
+                <h2>Performance Analytics</h2>
+            </div>
+            <div class="card-body">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card glass profile-card">
+            <div class="card-header">
+                <h2>Profile Information</h2>
+            </div>
+            <div class="card-body">
+                <div class="profile-detail">
+                    <span class="label">USN:</span>
+                    <span class="value">{{ profile.usn }}</span>
+                </div>
+                <div class="profile-detail">
+                    <span class="label">Course:</span>
+                    <span class="value">{{ profile.course }}</span>
+                </div>
+                <div class="profile-detail">
+                    <span class="label">Semester:</span>
+                    <span class="value">{{ profile.semester }}</span>
+                </div>
+                <div class="profile-detail">
+                    <span class="label">Email:</span>
+                    <span class="value">{{ profile.email }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card glass table-card">
+        <div class="card-header">
+            <h2>Subject-wise Marks</h2>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Subject Code</th>
+                            <th>Subject Name</th>
+                            <th>Internal</th>
+                            <th>External</th>
+                            <th>Total</th>
+                            <th>Grade</th>
+                            <th>Lecturer</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mark in marks %}
+                        <tr>
+                            <td>{{ mark.subject_code }}</td>
+                            <td>{{ mark.subject_name }}</td>
+                            <td>{{ mark.internal_marks }}</td>
+                            <td>{{ mark.external_marks }}</td>
+                            <td><strong>{{ mark.total_marks }}</strong></td>
+                            <td><span class="badge grade-{{ mark.grade }}">{{ mark.grade }}</span></td>
+                            <td>{{ mark.lecturer_name }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">No marks available for this semester.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        const labels = [{% for mark in marks %}"{{ mark.subject_code }}",{% endfor %}];
+        const data = [{% for mark in marks %}{{ mark.total_marks }},{% endfor %}];
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Marks Obtained',
+                    data: data,
+                    backgroundColor: 'rgba(79, 70, 229, 0.6)',
+                    borderColor: 'rgba(79, 70, 229, 1)',
+                    borderWidth: 1,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

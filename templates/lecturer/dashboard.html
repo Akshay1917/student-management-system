@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Lecturer Dashboard - SMS{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <div class="welcome-section">
+            <h1>Welcome back, <span class="text-gradient">{{ profile.first_name }}</span>!</h1>
+            <p class="text-muted">Managing {{ profile.department }} department.</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('lecturer.upload_marks') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Upload Marks
+            </a>
+        </div>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card glass">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-info">
+                <h3>Total Students</h3>
+                <p class="stat-value">{{ stats.total_students }}</p>
+            </div>
+        </div>
+        <div class="stat-card glass">
+            <div class="stat-icon"><i class="fas fa-book"></i></div>
+            <div class="stat-info">
+                <h3>Subjects</h3>
+                <p class="stat-value">{{ stats.total_subjects }}</p>
+            </div>
+        </div>
+        <div class="stat-card glass">
+            <div class="stat-icon"><i class="fas fa-clipboard-check"></i></div>
+            <div class="stat-info">
+                <h3>Department</h3>
+                <p class="stat-value" style="font-size: 1rem;">{{ profile.department }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="card glass">
+            <div class="card-header">
+                <h2>Recent Mark Entries</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>USN</th>
+                                <th>Name</th>
+                                <th>Subject</th>
+                                <th>Total</th>
+                                <th>Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for mark in stats.recent_marks %}
+                            <tr>
+                                <td>{{ mark.usn }}</td>
+                                <td>{{ mark.first_name }} {{ mark.last_name }}</td>
+                                <td>{{ mark.subject_code }}</td>
+                                <td><strong>{{ mark.total_marks }}</strong></td>
+                                <td><span class="badge grade-{{ mark.grade }}">{{ mark.grade }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <a href="{{ url_for('lecturer.reports') }}" class="text-primary">View all reports &rarr;</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card glass">
+            <div class="card-header">
+                <h2>Grade Distribution</h2>
+            </div>
+            <div class="card-body" style="height: 300px;">
+                <canvas id="gradeDistributionChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('gradeDistributionChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['O', 'A+', 'A', 'B', 'F'],
+            datasets: [{
+                label: 'Grade Distribution',
+                data: [12, 19, 3, 5, 2], // Dummy data for now
+                backgroundColor: [
+                    '#FFD700',
+                    '#0074D9',
+                    '#2ECC40',
+                    '#FF851B',
+                    '#FF4136'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' },
+                title: { display: true, text: 'Overall Grade Distribution' }
+            }
+        }
+    });
+</script>
+{% endblock %}

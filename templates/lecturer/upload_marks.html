@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Marks - SMS{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <div class="welcome-section">
+            <h1>Upload <span class="text-gradient">Marks</span></h1>
+            <p class="text-muted">Import student marks from a CSV or Excel file.</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('lecturer.dashboard') }}" class="btn glass">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </header>
+
+    <div class="dashboard-grid">
+        <div class="card glass">
+            <div class="card-header">
+                <h2>Marks File</h2>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('lecturer.upload_marks') }}" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="file">Choose CSV or Excel file</label>
+                        <input type="file" id="file" name="file" class="form-control" accept=".csv,.xlsx" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Upload Marks
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card glass">
+            <div class="card-header">
+                <h2>Required Columns</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Column</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>usn</td><td>S001</td></tr>
+                            <tr><td>subject_code</td><td>CS401</td></tr>
+                            <tr><td>internal_marks</td><td>25</td></tr>
+                            <tr><td>external_marks</td><td>60</td></tr>
+                            <tr><td>semester</td><td>4</td></tr>
+                            <tr><td>academic_year</td><td>2023-24</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

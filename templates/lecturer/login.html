@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Lecturer Login - SMS{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="card glass auth-card">
+        <div class="welcome-section" style="text-align: center; margin-bottom: 2rem;">
+            <h1>Faculty <span class="text-gradient">Login</span></h1>
+            <p class="text-muted">Enter your employee ID to manage student marks.</p>
+        </div>
+        <form action="{{ url_for('auth.lecturer_login') }}" method="POST">
+            <div class="form-group">
+                <label for="username">Employee ID</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="e.g. L101" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">
+                <i class="fas fa-lock"></i> Faculty Access
+            </button>
+        </form>
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.875rem;">
+            <p class="text-muted">Student? <a href="{{ url_for('auth.student_login') }}" class="text-primary">Switch to Student Portal</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

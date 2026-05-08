@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}SMS Portal - Modern Student Management{% endblock %}
+
+{% block content %}
+<div class="landing-page">
+    <section class="hero-section glass" style="margin-top: 2rem; padding: 4rem 2rem; text-align: center;">
+        <div class="hero-content">
+            <h1 style="font-size: 3.5rem; line-height: 1.2; margin-bottom: 1.5rem;">
+                Empowering <span class="text-gradient">Academic Excellence</span>
+            </h1>
+            <p class="text-muted" style="font-size: 1.25rem; max-width: 700px; margin: 0 auto 2.5rem;">
+                The all-in-one platform for students to track progress and lecturers to manage performance with precision and ease.
+            </p>
+            <div class="hero-btns" style="display: flex; gap: 1rem; justify-content: center;">
+                <a href="{{ url_for('auth.student_login') }}" class="btn btn-primary">
+                    <i class="fas fa-user-graduate"></i> Student Portal
+                </a>
+                <a href="{{ url_for('auth.lecturer_login') }}" class="btn glass" style="background: white;">
+                    <i class="fas fa-chalkboard-teacher"></i> Faculty Login
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 4rem;">
+        <div class="card glass feature-card" style="padding: 2.5rem; transition: transform 0.3s;">
+            <div class="stat-icon" style="margin-bottom: 1.5rem;"><i class="fas fa-chart-line"></i></div>
+            <h3 style="margin-bottom: 1rem;">Performance Tracking</h3>
+            <p class="text-muted">Real-time data visualization of marks and grades to help students monitor their academic journey.</p>
+        </div>
+
+        <div class="card glass feature-card" style="padding: 2.5rem; transition: transform 0.3s;">
+            <div class="stat-icon" style="margin-bottom: 1.5rem;"><i class="fas fa-file-pdf"></i></div>
+            <h3 style="margin-bottom: 1rem;">Automated Reports</h3>
+            <p class="text-muted">Generate and download professional PDF report cards with a single click, instantly.</p>
+        </div>
+
+        <div class="card glass feature-card" style="padding: 2.5rem; transition: transform 0.3s;">
+            <div class="stat-icon" style="margin-bottom: 1.5rem;"><i class="fas fa-cloud-upload-alt"></i></div>
+            <h3 style="margin-bottom: 1rem;">Bulk Management</h3>
+            <p class="text-muted">Faculty can upload thousands of records via Excel or CSV in seconds, saving valuable time.</p>
+        </div>
+    </section>
+
+    <section class="cta-section glass" style="margin-top: 4rem; padding: 3rem; text-align: center; background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(236, 72, 153, 0.05) 100%);">
+        <h2 style="margin-bottom: 1rem;">Ready to get started?</h2>
+        <p class="text-muted" style="margin-bottom: 2rem;">Join hundreds of students and faculty members already using the SMS Portal.</p>
+        <a href="#top" class="text-primary" style="font-weight: 600; text-decoration: none;">Explore Features &darr;</a>
+    </section>
+</div>
+
+<style>
+    .feature-card:hover {
+        transform: translateY(-10px);
+        border-color: var(--primary);
+    }
+    @media (max-width: 768px) {
+        .hero-section h1 { font-size: 2.5rem !important; }
+    }
+</style>
+{% endblock %}
