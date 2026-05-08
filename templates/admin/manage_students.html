@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Students - Admin{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <div class="welcome-section">
+            <h1>Manage <span class="text-gradient">Students</span></h1>
+            <p class="text-muted">Add, view, or remove student accounts.</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('admin.dashboard') }}" class="btn glass">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </header>
+
+    <div class="dashboard-grid">
+        <!-- Add Student Form -->
+        <div class="card glass">
+            <div class="card-header">
+                <h2>Add New Student</h2>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('admin.add_student') }}" method="POST">
+                    <div class="form-group">
+                        <label>USN</label>
+                        <input type="text" name="usn" class="form-control" required placeholder="e.g. S003">
+                    </div>
+                    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <label>First Name</label>
+                            <input type="text" name="first_name" class="form-control" required>
+                        </div>
+                        <div>
+                            <label>Last Name</label>
+                            <input type="text" name="last_name" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Course</label>
+                        <input type="text" name="course" class="form-control" required placeholder="e.g. B.Tech CS">
+                    </div>
+                    <div class="form-group">
+                        <label>Semester</label>
+                        <input type="number" name="semester" class="form-control" required min="1" max="8">
+                    </div>
+                    <div class="form-group">
+                        <label>Default Password</label>
+                        <input type="text" name="password" class="form-control" value="password123">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                        <i class="fas fa-user-plus"></i> Register Student
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Student List -->
+        <div class="card glass">
+            <div class="card-header">
+                <h2>Current Students</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>USN</th>
+                                <th>Name</th>
+                                <th>Course</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in students %}
+                            <tr>
+                                <td>{{ s.usn }}</td>
+                                <td>{{ s.first_name }} {{ s.last_name }}</td>
+                                <td>{{ s.course }} (Sem {{ s.semester }})</td>
+                                <td>
+                                    <a href="{{ url_for('admin.delete_student', id=s.student_id) }}" 
+                                       class="text-danger" 
+                                       onclick="return confirm('Are you sure you want to delete this student and their auth account?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

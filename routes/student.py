@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, redirect, url_for, flash, send_file, Response
+from flask import Blueprint, render_template, session, redirect, url_for, flash, send_file, Response, request
 from models.queries import Queries
 from functools import wraps
 import os
@@ -8,6 +8,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
+from routes.auth import bcrypt
 
 student_bp = Blueprint('student', __name__, url_prefix='/student')
 
@@ -92,3 +93,58 @@ def download_report():
         download_name=f"Report_{profile['usn']}.pdf",
         mimetype='application/pdf'
     )
+
+@student_bp.route('/profile', methods=['GET', 'POST'])
+@student_required
+def profile():
+    student_id = session['user_id']
+    if request.method == 'POST':
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('new_password')
+        profile_pic = request.files.get('profile_pic')
+        
+        try:
+            # 1. Update basic info
+            Queries.execute_query(
+                "UPDATE students SET email = %s, phone = %s WHERE student_id = %s",
+                (email, phone, student_id)
+            )
+            
+            # 2. Handle Profile Picture
+            if profile_pic and profile_pic.filename:
+                ext = os.path.splitext(profile_pic.filename)[1].lower()
+                if ext in ['.jpg', '.jpeg', '.png']:
+                    filename = f"student_{student_id}{ext}"
+                    filepath = os.path.join(current_app.config['PROFILE_PICS_FOLDER'], filename)
+                    profile_pic.save(filepath)
+                    Queries.execute_query(
+                        "UPDATE students SET profile_pic = %s WHERE student_id = %s",
+                        (filename, student_id)
+                    )
+                else:
+                    flash('Invalid image format. Use JPG or PNG.', 'warning')
+            
+            # 2. Update password if requested
+            if new_password and current_password:
+                user = Queries.get_user_by_username(session['username'])
+                if bcrypt.check_password_hash(user['password_hash'], current_password):
+                    new_hash = bcrypt.generate_password_hash(new_password).decode('utf-8')
+                    Queries.execute_query(
+                        "UPDATE auth SET password_hash = %s WHERE auth_id = %s",
+                        (new_hash, session['auth_id'])
+                    )
+                    flash('Profile and password updated successfully!', 'success')
+                else:
+                    flash('Current password incorrect. Info updated, but password remains unchanged.', 'warning')
+            else:
+                flash('Profile updated successfully!', 'success')
+                
+        except Exception as e:
+            flash(f'Error updating profile: {str(e)}', 'error')
+            
+        return redirect(url_for('student.profile'))
+        
+    profile_data = Queries.get_student_profile(student_id)
+    return render_template('student/profile.html', profile=profile_data)

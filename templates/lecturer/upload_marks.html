@@ -6,20 +6,73 @@
 <div class="dashboard-container">
     <header class="dashboard-header">
         <div class="welcome-section">
-            <h1>Upload <span class="text-gradient">Marks</span></h1>
-            <p class="text-muted">Import student marks from a CSV or Excel file.</p>
+            <h1>Update <span class="text-gradient">Student Marks</span></h1>
+            <p class="text-muted">Choose between bulk file upload or manual individual entry.</p>
         </div>
         <div class="header-actions">
             <a href="{{ url_for('lecturer.dashboard') }}" class="btn glass">
-                <i class="fas fa-arrow-left"></i> Back
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
             </a>
         </div>
     </header>
 
     <div class="dashboard-grid">
+        <!-- Manual Entry Card -->
         <div class="card glass">
             <div class="card-header">
-                <h2>Marks File</h2>
+                <h2><i class="fas fa-edit"></i> Manual Individual Entry</h2>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('lecturer.submit_mark_manual') }}" method="POST">
+                    <div class="form-group">
+                        <label>Select Student</label>
+                        <select name="usn" class="form-control" required>
+                            <option value="">-- Select Student --</option>
+                            {% for s in students %}
+                                <option value="{{ s.usn }}">{{ s.usn }} - {{ s.first_name }} {{ s.last_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Subject</label>
+                        <select name="subject_code" class="form-control" required>
+                            <option value="">-- Select Subject --</option>
+                            {% for sub in subjects %}
+                                <option value="{{ sub.subject_code }}">{{ sub.subject_code }} - {{ sub.subject_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <label>Internal Marks</label>
+                            <input type="number" step="0.01" name="internal_marks" class="form-control" required min="0" max="100">
+                        </div>
+                        <div>
+                            <label>External Marks</label>
+                            <input type="number" step="0.01" name="external_marks" class="form-control" required min="0" max="100">
+                        </div>
+                    </div>
+                    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <label>Semester</label>
+                            <input type="number" name="semester" class="form-control" required min="1" max="8">
+                        </div>
+                        <div>
+                            <label>Academic Year</label>
+                            <input type="text" name="academic_year" class="form-control" required placeholder="e.g. 2023-24">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                        <i class="fas fa-save"></i> Submit Mark
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Bulk Upload Card -->
+        <div class="card glass">
+            <div class="card-header">
+                <h2><i class="fas fa-file-upload"></i> Bulk File Upload</h2>
             </div>
             <div class="card-body">
                 <form action="{{ url_for('lecturer.upload_marks') }}" method="POST" enctype="multipart/form-data">
@@ -27,36 +80,13 @@
                         <label for="file">Choose CSV or Excel file</label>
                         <input type="file" id="file" name="file" class="form-control" accept=".csv,.xlsx" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-upload"></i> Upload Marks
+                    <div class="alert alert-info" style="margin-bottom: 1.5rem; font-size: 0.85rem;">
+                        <strong>Format:</strong> usn, subject_code, internal_marks, external_marks, semester, academic_year
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                        <i class="fas fa-upload"></i> Upload Marks File
                     </button>
                 </form>
-            </div>
-        </div>
-
-        <div class="card glass">
-            <div class="card-header">
-                <h2>Required Columns</h2>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Column</th>
-                                <th>Example</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>usn</td><td>S001</td></tr>
-                            <tr><td>subject_code</td><td>CS401</td></tr>
-                            <tr><td>internal_marks</td><td>25</td></tr>
-                            <tr><td>external_marks</td><td>60</td></tr>
-                            <tr><td>semester</td><td>4</td></tr>
-                            <tr><td>academic_year</td><td>2023-24</td></tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
         </div>
     </div>

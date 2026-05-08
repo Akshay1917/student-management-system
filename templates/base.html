@@ -14,11 +14,21 @@
         <div class="container navbar-content" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <a href="/" class="nav-brand">SMS<span class="text-gradient">Portal</span></a>
             <div class="nav-links">
-                {% if session.user_id %}
+                {% if session.get('role') %}
                     {% if session.role == 'student' %}
                         <a href="{{ url_for('student.dashboard') }}">Dashboard</a>
-                    {% else %}
+                        <a href="{{ url_for('student.profile') }}" class="nav-profile">
+                            <img src="{{ url_for('static', filename='uploads/profile_pics/' + session.profile_pic) if session.profile_pic and session.profile_pic != 'default.png' else 'https://ui-avatars.com/api/?name=' + session.username }}" alt="Profile" class="nav-avatar">
+                            Profile
+                        </a>
+                    {% elif session.role == 'lecturer' %}
                         <a href="{{ url_for('lecturer.dashboard') }}">Dashboard</a>
+                        <a href="{{ url_for('lecturer.profile') }}" class="nav-profile">
+                            <img src="{{ url_for('static', filename='uploads/profile_pics/' + session.profile_pic) if session.profile_pic and session.profile_pic != 'default.png' else 'https://ui-avatars.com/api/?name=' + session.username }}" alt="Profile" class="nav-avatar">
+                            Profile
+                        </a>
+                    {% elif session.role == 'admin' %}
+                        <a href="{{ url_for('admin.dashboard') }}">Dashboard</a>
                     {% endif %}
                     <a href="{{ url_for('auth.logout') }}" class="btn btn-primary" style="padding: 0.5rem 1rem;">Logout</a>
                 {% else %}
@@ -41,9 +51,10 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="footer">
+    <footer class="footer" style="margin-top: 4rem; padding: 2rem 0; border-top: 1px solid var(--border); text-align: center;">
         <div class="container">
-            <p>&copy; 2026 Student Management System. All rights reserved.</p>
+            <p class="text-muted">&copy; 2026 Student Management System. All rights reserved.</p>
+            <p style="margin-top: 0.5rem;"><a href="{{ url_for('auth.admin_login') }}" class="text-muted" style="text-decoration: none; font-size: 0.8rem;">Administrative Access</a></p>
         </div>
     </footer>
 

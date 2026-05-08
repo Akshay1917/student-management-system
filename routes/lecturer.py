@@ -4,6 +4,7 @@ from functools import wraps
 from utils.excel_parser import FileParser
 import os
 from werkzeug.utils import secure_filename
+from routes.auth import bcrypt
 
 lecturer_bp = Blueprint('lecturer', __name__, url_prefix='/lecturer')
 
@@ -95,10 +96,95 @@ def upload_marks():
         flash('Invalid file type. Please upload a CSV or Excel file.', 'error')
         return redirect(request.url)
             
-    return render_template('lecturer/upload_marks.html')
+    # Fetch students and subjects for manual entry
+    students = Queries.execute_query("SELECT usn, first_name, last_name FROM students", fetchall=True)
+    subjects = Queries.execute_query("SELECT subject_code, subject_name FROM subjects", fetchall=True)
+            
+    return render_template('lecturer/upload_marks.html', students=students, subjects=subjects)
+
+@lecturer_bp.route('/manual-entry', methods=['POST'])
+@lecturer_required
+def submit_mark_manual():
+    usn = request.form.get('usn')
+    subject_code = request.form.get('subject_code')
+    internal = request.form.get('internal_marks')
+    external = request.form.get('external_marks')
+    semester = request.form.get('semester')
+    academic_year = request.form.get('academic_year')
+    lecturer_id = session['user_id']
+    
+    try:
+        Queries.call_procedure('sp_upsert_mark', (
+            usn,
+            subject_code,
+            lecturer_id,
+            float(internal),
+            float(external),
+            int(semester),
+            str(academic_year)
+        ))
+        flash(f'Mark for {usn} updated successfully!', 'success')
+    except Exception as e:
+        flash(f'Error updating mark: {str(e)}', 'error')
+        
+    return redirect(url_for('lecturer.upload_marks'))
 
 @lecturer_bp.route('/reports')
 @lecturer_required
 def reports():
     marks = Queries.execute_query("SELECT * FROM vw_student_marks", fetchall=True)
     return render_template('lecturer/reports.html', marks=marks)
+
+@lecturer_bp.route('/profile', methods=['GET', 'POST'])
+@lecturer_required
+def profile():
+    lecturer_id = session['user_id']
+    if request.method == 'POST':
+        email = request.form.get('email')
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('new_password')
+        profile_pic = request.files.get('profile_pic')
+        
+        try:
+            # 1. Update basic info
+            Queries.execute_query(
+                "UPDATE lecturers SET email = %s WHERE lecturer_id = %s",
+                (email, lecturer_id)
+            )
+            
+            # 2. Handle Profile Picture
+            if profile_pic and profile_pic.filename:
+                ext = os.path.splitext(profile_pic.filename)[1].lower()
+                if ext in ['.jpg', '.jpeg', '.png']:
+                    filename = f"lecturer_{lecturer_id}{ext}"
+                    filepath = os.path.join(current_app.config['PROFILE_PICS_FOLDER'], filename)
+                    profile_pic.save(filepath)
+                    Queries.execute_query(
+                        "UPDATE lecturers SET profile_pic = %s WHERE lecturer_id = %s",
+                        (filename, lecturer_id)
+                    )
+                else:
+                    flash('Invalid image format. Use JPG or PNG.', 'warning')
+            
+            # 2. Update password if requested
+            if new_password and current_password:
+                user = Queries.get_user_by_username(session['username'])
+                if bcrypt.check_password_hash(user['password_hash'], current_password):
+                    new_hash = bcrypt.generate_password_hash(new_password).decode('utf-8')
+                    Queries.execute_query(
+                        "UPDATE auth SET password_hash = %s WHERE auth_id = %s",
+                        (new_hash, session['auth_id'])
+                    )
+                    flash('Profile and password updated successfully!', 'success')
+                else:
+                    flash('Current password incorrect. Info updated, but password remains unchanged.', 'warning')
+            else:
+                flash('Profile updated successfully!', 'success')
+                
+        except Exception as e:
+            flash(f'Error updating profile: {str(e)}', 'error')
+            
+        return redirect(url_for('lecturer.profile'))
+        
+    profile_data = Queries.get_lecturer_profile(lecturer_id)
+    return render_template('lecturer/profile.html', profile=profile_data)

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Subjects - Admin{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <div class="welcome-section">
+            <h1>Manage <span class="text-gradient">Subjects</span></h1>
+            <p class="text-muted">Define the curriculum and academic subjects.</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('admin.dashboard') }}" class="btn glass">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </header>
+
+    <div class="dashboard-grid">
+        <div class="card glass">
+            <div class="card-header">
+                <h2>Add New Subject</h2>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('admin.add_subject') }}" method="POST">
+                    <div class="form-group">
+                        <label>Subject Code</label>
+                        <input type="text" name="subject_code" class="form-control" required placeholder="e.g. CS501">
+                    </div>
+                    <div class="form-group">
+                        <label>Subject Name</label>
+                        <input type="text" name="subject_name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Credits</label>
+                        <input type="number" name="credits" class="form-control" required min="1" max="5" value="4">
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <input type="text" name="department" class="form-control" required
+                            placeholder="e.g. Computer Science">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                        <i class="fas fa-book-medical"></i> Add Subject
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card glass">
+            <div class="card-header">
+                <h2>Subject Catalog</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Credits</th>
+                                <th>Dept</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in subjects %}
+                            <tr>
+                                <td>{{ s.subject_code }}</td>
+                                <td>{{ s.subject_name }}</td>
+                                <td>{{ s.credits }}</td>
+                                <td>{{ s.department }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

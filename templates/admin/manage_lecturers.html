@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Lecturers - Admin{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <div class="welcome-section">
+            <h1>Manage <span class="text-gradient">Lecturers</span></h1>
+            <p class="text-muted">Register and manage faculty members.</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('admin.dashboard') }}" class="btn glass">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </header>
+
+    <div class="dashboard-grid">
+        <div class="card glass">
+            <div class="card-header">
+                <h2>Add New Lecturer</h2>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('admin.add_lecturer') }}" method="POST">
+                    <div class="form-group">
+                        <label>Employee ID</label>
+                        <input type="text" name="employee_id" class="form-control" required placeholder="e.g. L103">
+                    </div>
+                    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <label>First Name</label>
+                            <input type="text" name="first_name" class="form-control" required>
+                        </div>
+                        <div>
+                            <label>Last Name</label>
+                            <input type="text" name="last_name" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <input type="text" name="department" class="form-control" required placeholder="e.g. Computer Science">
+                    </div>
+                    <div class="form-group">
+                        <label>Default Password</label>
+                        <input type="text" name="password" class="form-control" value="password123">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                        <i class="fas fa-user-tie"></i> Register Faculty
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card glass">
+            <div class="card-header">
+                <h2>Faculty List</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Emp ID</th>
+                                <th>Name</th>
+                                <th>Department</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for l in lecturers %}
+                            <tr>
+                                <td>{{ l.employee_id }}</td>
+                                <td>{{ l.first_name }} {{ l.last_name }}</td>
+                                <td>{{ l.department }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -14,10 +14,13 @@ def student_login():
         user = Queries.get_user_by_username(username)
         
         if user and user['role'] == 'student' and bcrypt.check_password_hash(user['password_hash'], password):
+            # Fetch student profile for pic
+            student = Queries.get_student_profile(user['user_id'])
             session['user_id'] = user['user_id']
             session['auth_id'] = user['auth_id']
             session['username'] = user['username']
             session['role'] = 'student'
+            session['profile_pic'] = student['profile_pic']
             flash('Login successful!', 'success')
             return redirect(url_for('student.dashboard'))
         else:
@@ -34,16 +37,39 @@ def lecturer_login():
         user = Queries.get_user_by_username(username)
         
         if user and user['role'] == 'lecturer' and bcrypt.check_password_hash(user['password_hash'], password):
+            # Fetch lecturer profile for pic
+            lecturer = Queries.get_lecturer_profile(user['user_id'])
             session['user_id'] = user['user_id']
             session['auth_id'] = user['auth_id']
             session['username'] = user['username']
             session['role'] = 'lecturer'
-            flash('Login successful!', 'success')
+            session['profile_pic'] = lecturer['profile_pic']
+            flash('Faculty Login successful!', 'success')
             return redirect(url_for('lecturer.dashboard'))
         else:
             flash('Invalid Employee ID or password', 'error')
             
     return render_template('lecturer/login.html')
+
+@auth_bp.route('/login/admin', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        user = Queries.get_user_by_username(username)
+        
+        if user and user['role'] == 'admin' and bcrypt.check_password_hash(user['password_hash'], password):
+            session['user_id'] = user['user_id']
+            session['auth_id'] = user['auth_id']
+            session['username'] = user['username']
+            session['role'] = 'admin'
+            flash('Admin Login successful!', 'success')
+            return redirect(url_for('admin.dashboard'))
+        else:
+            flash('Invalid Admin credentials', 'error')
+            
+    return render_template('admin/login.html')
 
 @auth_bp.route('/logout')
 def logout():

@@ -12,8 +12,9 @@ class Config:
     MYSQL_DB = os.environ.get('MYSQL_DB') or 'student_management_db'
     MYSQL_PORT = int(os.environ.get('MYSQL_PORT') or 3306)
     
-    # Upload Folder
+    # Upload Folders
     UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
+    PROFILE_PICS_FOLDER = os.path.join(UPLOAD_FOLDER, 'profile_pics')
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max upload
     
     # Session config

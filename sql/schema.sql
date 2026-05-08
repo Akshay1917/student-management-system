@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS students (
     phone VARCHAR(15),
     course VARCHAR(100),
     semester INT,
+    profile_pic VARCHAR(255) DEFAULT 'default.png',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -24,6 +25,7 @@ CREATE TABLE IF NOT EXISTS lecturers (
     last_name VARCHAR(50) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     department VARCHAR(100),
+    profile_pic VARCHAR(255) DEFAULT 'default.png',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

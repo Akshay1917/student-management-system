@@ -4,15 +4,17 @@ from models import db
 from routes.auth import auth_bp, bcrypt
 from routes.lecturer import lecturer_bp
 from routes.student import student_bp
+from routes.admin import admin_bp
 import os
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # Ensure upload folder exists
-    if not os.path.exists(app.config['UPLOAD_FOLDER']):
-        os.makedirs(app.config['UPLOAD_FOLDER'])
+    # Ensure upload folders exist
+    for folder in [app.config['UPLOAD_FOLDER'], app.config['PROFILE_PICS_FOLDER']]:
+        if not os.path.exists(folder):
+            os.makedirs(folder)
 
     # Initialize Extensions
     db.init_app(app)
@@ -22,6 +24,7 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(lecturer_bp)
     app.register_blueprint(student_bp)
+    app.register_blueprint(admin_bp)
 
     @app.route('/')
     def index():
@@ -30,6 +33,8 @@ def create_app():
                 return redirect(url_for('student.dashboard'))
             elif session.get('role') == 'lecturer':
                 return redirect(url_for('lecturer.dashboard'))
+            elif session.get('role') == 'admin':
+                return redirect(url_for('admin.dashboard'))
         return render_template('index.html')
 
     @app.errorhandler(404)
